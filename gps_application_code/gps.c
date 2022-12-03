@@ -5,20 +5,19 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/types.h>
-//#include <unistd.h>
-
-#define ssize_t int
-
-#define SEEK_SET 0
+#include <unistd.h>
+#include <stdio.h>
 
 unsigned long startPoint = 0;
+
+#define GPS_FILE "/dev/hw_serial-48022000"
 
 void GpgllHandler(char* gpsMessage, int messageSize);
 void PrintGpgllMesg(struct gpgll_s* msgPtr);
 
 int OpenPort()
 {
-	int dataFd = open("gps_output.txt", O_RDONLY);
+	int dataFd = open(GPS_FILE, O_RDONLY);
 	if (dataFd == -1)
 	{
 		// Error

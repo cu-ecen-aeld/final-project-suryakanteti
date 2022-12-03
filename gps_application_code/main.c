@@ -1,5 +1,4 @@
 #include "gps.h"
-
 #include <stdio.h>
 
 

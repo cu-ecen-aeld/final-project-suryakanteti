@@ -9,8 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 
-//#define ssize_t int
-
 unsigned long startPoint = 0;
 
 #define GPS_FILE "/dev/hw_serial-48022000"
@@ -61,11 +59,13 @@ int GetToValidMessage(int dataFd)
 			break;
 	}
 
-	if (llseek(dataFd, pos, SEEK_SET) == -1)
+	if (lseek(dataFd, pos, SEEK_SET) == -1)
 	{
-		perror("GetToValidMessage llseek");
+		perror("GetToValidMessage lseek");
 		return -1;
 	}
+
+	startPoint += pos;
 
 	return 0;
 }
@@ -93,9 +93,9 @@ int ReadMessage(int dataFd, char* gpsMessage)
 
 	// Adjust where to read from
 	startPoint += pos + 2;
-	if (llseek(dataFd, startPoint, SEEK_SET) == -1)
+	if (lseek(dataFd, startPoint, SEEK_SET) == -1)
 	{
-		perror("ReadMessage llseek");
+		perror("ReadMessage lseek");
 		return -1;
 	}
 
@@ -109,16 +109,18 @@ void HandleMessage(char* gpsMessage, int messageSize)
 
 	// Parse message type
 	messageType[5] = '\0';
-	strncpy(messageType, gpsMessage + 1, 5);
+	strncpy(messageType, gpsMessage, 5);
+
+	printf("Message Type: %s\n", messageType);
 
 	if (strcmp(messageType, "GPGLL") == 0)
 	{
 		GpgllHandler(gpsMessage, messageSize);
 	}
-	else
+	/*else
 	{
 		printf("Invalid command!\n");
-	}
+	}*/
 }
 
 void GpgllHandler(char* gpsMessage, int messageSize)

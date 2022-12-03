@@ -14,6 +14,14 @@ int main()
 		return -1;
 	}
 
+	// Get to start of message
+	int rc = GetToValidMessage(dataFd);
+	if (rc == -1)
+	{
+		printf("GetToValidMessage() failed!\n");
+		return -1;
+	}
+
 	while (1)
 	{
 

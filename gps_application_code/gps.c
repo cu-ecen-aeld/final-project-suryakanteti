@@ -9,9 +9,12 @@
 #include <stdio.h>
 #include <string.h>
 
+//#define ssize_t int
+
 unsigned long startPoint = 0;
 
 #define GPS_FILE "/dev/hw_serial-48022000"
+//#define GPS_FILE "gps_output.txt"
 
 void GpgllHandler(char* gpsMessage, int messageSize);
 void PrintGpgllMesg(struct gpgll_s* msgPtr);
@@ -28,23 +31,54 @@ int OpenPort()
 	return dataFd;
 }
 
+int GetToValidMessage(int dataFd)
+{
+	ssize_t rc;
+	char c = '\0';
+
+	while (1)
+	{
+		while (c != '$')
+		{
+			rc = read(dataFd, &c, sizeof(char));
+			if (rc == -1)
+			{
+				perror("GetToValidMessage read()");
+				return -1;
+			}
+		}
+
+		rc = read(dataFd, &c, sizeof(char));
+		if (rc == -1)
+		{
+			perror("GetToValidMessage read() 1");
+			return -1;
+		}
+
+		if (c == 'G')
+			break;
+	}
+
+	if (lseek(dataFd, -2, SEEK_CUR) == -1)
+	{
+		perror("ReadMessage lseek");
+		return -1;
+	}
+
+	return 0;
+}
+
 int ReadMessage(int dataFd, char* gpsMessage)
 {
 	ssize_t rc;
 
 	// Read until the max length
-	rc = read(dataFd, gpsMessage, MESSAGE_MAX_LENGTH);
+	rc = read(dataFd, gpsMessage, MESSAGE_MAX_LENGTH * sizeof(char));
 	if (rc == -1)
 	{
 		perror("ReadMessage read()");
 		return -1;
 	}
-
-	printf("\n\nStart of message!\n\n");
-
-	printf("%s", gpsMessage);
-
-	printf("\n\nEnd of message!\n\n");
 
 	// Find the first \n
 	int pos = FindCharacter(gpsMessage, MESSAGE_MAX_LENGTH, '\n', 1);

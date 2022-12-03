@@ -1,16 +1,22 @@
-# Default compiler
-CC = gcc
+#selecting complier
+CROSS_COMPILE=
+CC ?=$(CROSS_COMPILE)gcc
 
-all: mma8452q
+#selecting Targer file
+TARGET ?= mma8452q
 
-# mma8452q application
-mma8452q: clean mma8452q.o
-	$(CROSS_COMPILE)$(CC) mma8452q.o -o mma8452q
+#setting flags
+#CFLAGS  ?= -Werror -Wall
+#LDFLAGS ?= -pthread -lrt
 
-# mma8452q.o files	
-mma8452q.o: mma8452q.c
-	$(CROSS_COMPILE)$(CC) -c mma8452q.c
-	
-# Clean all binaries
+#selecting all needed source files
+SRC_FILES = $(TARGET).c
+
+all: $(TARGET)
+#clean:
+#	rm -f *.o writer
+
+$(TARGET): $(TARGET).c
+	$(CC) $(CFLAGS) $(SRC_FILES) -o $(TARGET) $(LDFLAGS)
 clean:
-	rm -f *.o mma8452q
+	rm -f *.o $(TARGET)

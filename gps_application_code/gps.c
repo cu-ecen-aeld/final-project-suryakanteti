@@ -77,6 +77,7 @@ int ParseMessages(int dataFd)
 	// Handle Gps message
 	strncpy(gpsMessage, buffer, endPos); // Without \n
 	gpsMessage[endPos] = '\0';
+	printf("GPS Message: %s", gpsMessage);
 	HandleMessage(gpsMessage, endPos);
 	
 	// Adjust the buffer

@@ -61,9 +61,9 @@ int GetToValidMessage(int dataFd)
 			break;
 	}
 
-	if (lseek(dataFd, pos, SEEK_SET) == -1)
+	if (llseek(dataFd, pos, SEEK_SET) == -1)
 	{
-		perror("GetToValidMessage lseek");
+		perror("GetToValidMessage llseek");
 		return -1;
 	}
 
@@ -93,9 +93,9 @@ int ReadMessage(int dataFd, char* gpsMessage)
 
 	// Adjust where to read from
 	startPoint += pos + 2;
-	if (lseek(dataFd, startPoint, SEEK_SET) == -1)
+	if (llseek(dataFd, startPoint, SEEK_SET) == -1)
 	{
-		perror("ReadMessage lseek");
+		perror("ReadMessage llseek");
 		return -1;
 	}
 

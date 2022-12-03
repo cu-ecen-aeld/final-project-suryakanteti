@@ -40,6 +40,12 @@ int ReadMessage(int dataFd, char* gpsMessage)
 		return -1;
 	}
 
+	printf("\n\nStart of message!\n\n");
+
+	printf("%s", gpsMessage);
+
+	printf("\n\nEnd of message!\n\n");
+
 	// Find the first \n
 	int pos = FindCharacter(gpsMessage, MESSAGE_MAX_LENGTH, '\n', 1);
 	if (pos == -1)

@@ -35,12 +35,14 @@ int GetToValidMessage(int dataFd)
 {
 	ssize_t rc;
 	char c = '\0';
+	int pos = 0;
 
 	while (1)
 	{
 		while (c != '$')
 		{
 			rc = read(dataFd, &c, sizeof(char));
+			pos++;
 			if (rc == -1)
 			{
 				perror("GetToValidMessage read()");
@@ -59,9 +61,9 @@ int GetToValidMessage(int dataFd)
 			break;
 	}
 
-	if (lseek(dataFd, -2, SEEK_CUR) == -1)
+	if (lseek(dataFd, pos, SEEK_SET) == -1)
 	{
-		perror("ReadMessage lseek");
+		perror("GetToValidMessage lseek");
 		return -1;
 	}
 

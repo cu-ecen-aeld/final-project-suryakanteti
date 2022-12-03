@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#define MESSAGE_MAX_LENGTH 256
+#define MESSAGE_MAX_LENGTH 128
 
 struct gpgll_s {
 

@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -40,6 +40,9 @@ int ParseMessages(int dataFd)
 
 	// Read until the max length
 	bytesRead = read(dataFd, buffer + startPos, (MESSAGE_MAX_LENGTH - startPos) * sizeof(char));
+	
+	printf("Buffer: %s", buffer);
+	
 	if (bytesRead == -1)
 	{
 		perror("ReadMessage read()");

@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 
-#define MMA8452Q_FILE "/dev/i2c-1"
+#define MMA8452Q_FILE "/dev/i2c-2"
 #define MMA8452Q_ADDR 0x1D
 #define WHO_AM_I 0x0D
 

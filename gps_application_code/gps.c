@@ -8,13 +8,10 @@
 #include <stdio.h>
 #include <string.h>
 
-//#define ssize_t int
+#define ssize_t int
 
-#define GPS_FILE "/dev/hw_serial-48022000"
-//#define GPS_FILE "gps_output.txt"
-
-char buffer[MESSAGE_MAX_LENGTH];
-char gpsMessage[MESSAGE_MAX_LENGTH];
+//#define GPS_FILE "/dev/hw_serial-48022000"
+#define GPS_FILE "gps_output.txt"
 
 int startPos = 0;
 
@@ -33,60 +30,37 @@ int OpenPort()
 	return dataFd;
 }
 
-int ParseMessages(int dataFd)
+int ReadMessage(int dataFd)
 {
-	int pos = 0, endPos = 0;
-	ssize_t bytesRead;
+	char gpsMessage[MESSAGE_MAX_LENGTH];
+	ssize_t bytesRead = 0, totalBytesRead = 0;
 
-	// Read until the max length
-	bytesRead = read(dataFd, buffer + startPos, (MESSAGE_MAX_LENGTH - startPos) * sizeof(char));
-	
-	printf("Buffer: %s", buffer);
-	
-	if (bytesRead == -1)
-	{
-		perror("ReadMessage read()");
-		return -1;
-	}
+	char* msgPtr = gpsMessage;
 
-	// Reach till the valid message
-	while (1)
+	// Read one message until \n encountered
+	while (totalBytesRead <= MESSAGE_MAX_LENGTH)
 	{
-		pos = FindCharacter(buffer, bytesRead, '$', 1);
-		if (pos == -1)
+		bytesRead = read(dataFd, msgPtr, sizeof(char));
+		if (bytesRead == -1)
 		{
-			printf("Couldn't find $ in the message");
+			perror("ReadMessage read()");
 			return -1;
 		}
 
-		if (*(buffer + pos + 1) == 'G')
+		totalBytesRead += bytesRead;
+
+		if (*msgPtr == '\n')
 		{
+			*msgPtr = '\0';
 			break;
 		}
+
+		msgPtr++;
 	}
 
-	// Adjust the buffer
-	strncpy(buffer, buffer + pos, bytesRead - pos); // Should have $ as 1st character
-
-	// Find the end of one message
-	endPos = FindCharacter(buffer, startPos + bytesRead, '\n', 1);
-	if (endPos == -1)
-	{
-		// Logically shouldn't happen given that max message length is checked for
-		printf("Couldn't find instance number 1 of delimiter in the messages\n");
-		return -1;
-	}
-
-	// Handle Gps message
-	strncpy(gpsMessage, buffer, endPos); // Without \n
-	gpsMessage[endPos] = '\0';
-	printf("GPS Message: %s", gpsMessage);
-	HandleMessage(gpsMessage, endPos);
-	
-	// Adjust the buffer
-	strncpy(buffer, buffer + endPos + 1, startPos + bytesRead - endPos - 1); // SURYA: Whatever is after endpos needs to be dragged to start
-	startPos = startPos + bytesRead - endPos; // SURYA: Bytesread - Endpos becomes startPos
-	return endPos;
+	printf("GPS Message: %s\n", gpsMessage);
+	HandleMessage(gpsMessage, totalBytesRead);
+	return totalBytesRead;
 }
 
 void HandleMessage(char* gpsMessage, int messageSize)

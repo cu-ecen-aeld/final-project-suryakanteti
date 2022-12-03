@@ -15,10 +15,10 @@ int main()
 	while (1)
 	{
 		// Read one line
-		int messageSize = ParseMessages(dataFd);
+		int messageSize = ReadMessage(dataFd);
 		if (messageSize == -1)
 		{
-			printf("ParseMessages() failed!\n");
+			printf("ReadMessage() failed!\n");
 			return -1;
 		}
 	}

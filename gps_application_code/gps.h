@@ -28,7 +28,7 @@ enum GpsMessageType
 
 int OpenPort();
 
-int ParseMessages(int dataFd);
+int ReadMessage(int dataFd);
 
 void HandleMessage(char* gpsMessage, int messageSize);
 

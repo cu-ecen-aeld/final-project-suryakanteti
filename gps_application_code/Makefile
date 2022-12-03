@@ -1,22 +1,22 @@
-# Default compiler
-CC = gcc
+#selecting complier
+CROSS_COMPILE=
+CC ?=$(CROSS_COMPILE)gcc
 
-all: gps
+#selecting Targer file
+TARGET ?= gps
 
-# gps application
-gps: clean main.o gps.o misc.o
-	$(CROSS_COMPILE)$(CC) main.o gps.o misc.o -o gps
+#setting flags
+#CFLAGS  ?= -Werror -Wall
+#LDFLAGS ?= -pthread -lrt
 
-# gps files	
-main.o: gps.c
-	$(CROSS_COMPILE)$(CC) -c main.c
-	
-gps.o: gps.c
-	$(CROSS_COMPILE)$(CC) -c gps.c
-	
-misc.o: gps.c
-	$(CROSS_COMPILE)$(CC) -c misc.c
-	
-# Clean all binaries
+#selecting all needed source files
+SRC_FILES = $(TARGET).c main.c misc.c
+
+all: $(TARGET)
+#clean:
+#	rm -f *.o writer
+
+$(TARGET): $(TARGET).c main.c misc.c
+	$(CC) $(CFLAGS) $(SRC_FILES) -o $(TARGET) $(LDFLAGS)
 clean:
-	rm -f *.o gps
+	rm -f *.o $(TARGET)

@@ -4,15 +4,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 
-unsigned long startPoint = 0;
+//#define ssize_t int
 
 #define GPS_FILE "/dev/hw_serial-48022000"
 //#define GPS_FILE "gps_output.txt"
+
+char buffer[MESSAGE_MAX_LENGTH];
+char gpsMessage[MESSAGE_MAX_LENGTH];
+
+int startPos = 0;
 
 void GpgllHandler(char* gpsMessage, int messageSize);
 void PrintGpgllMesg(struct gpgll_s* msgPtr);
@@ -29,78 +33,56 @@ int OpenPort()
 	return dataFd;
 }
 
-int GetToValidMessage(int dataFd)
+int ParseMessages(int dataFd)
 {
-	ssize_t rc;
-	char c = '\0';
-	int pos = 0;
-
-	while (1)
-	{
-		while (c != '$')
-		{
-			rc = read(dataFd, &c, sizeof(char));
-			pos++;
-			if (rc == -1)
-			{
-				perror("GetToValidMessage read()");
-				return -1;
-			}
-		}
-
-		rc = read(dataFd, &c, sizeof(char));
-		if (rc == -1)
-		{
-			perror("GetToValidMessage read() 1");
-			return -1;
-		}
-
-		if (c == 'G')
-			break;
-	}
-
-	if (lseek(dataFd, pos, SEEK_SET) == -1)
-	{
-		perror("GetToValidMessage lseek");
-		return -1;
-	}
-
-	startPoint += pos;
-
-	return 0;
-}
-
-int ReadMessage(int dataFd, char* gpsMessage)
-{
-	ssize_t rc;
+	int pos = 0, endPos = 0;
+	ssize_t bytesRead;
 
 	// Read until the max length
-	rc = read(dataFd, gpsMessage, MESSAGE_MAX_LENGTH * sizeof(char));
-	if (rc == -1)
+	bytesRead = read(dataFd, buffer + startPos, (MESSAGE_MAX_LENGTH - startPos) * sizeof(char));
+	if (bytesRead == -1)
 	{
 		perror("ReadMessage read()");
 		return -1;
 	}
 
-	// Find the first \n
-	int pos = FindCharacter(gpsMessage, MESSAGE_MAX_LENGTH, '\n', 1);
-	if (pos == -1)
+	// Reach till the valid message
+	while (1)
+	{
+		pos = FindCharacter(buffer, bytesRead, '$', 1);
+		if (pos == -1)
+		{
+			printf("Couldn't find $ in the message");
+			return -1;
+		}
+
+		if (*(buffer + pos + 1) == 'G')
+		{
+			break;
+		}
+	}
+
+	// Adjust the buffer
+	strncpy(buffer, buffer + pos, bytesRead - pos); // Should have $ as 1st character
+
+	// Find the end of one message
+	endPos = FindCharacter(buffer, startPos + bytesRead, '\n', 1);
+	if (endPos == -1)
 	{
 		// Logically shouldn't happen given that max message length is checked for
 		printf("Couldn't find instance number 1 of delimiter in the messages\n");
 		return -1;
 	}
 
-	// Adjust where to read from
-	startPoint += pos + 2;
-	if (lseek(dataFd, startPoint, SEEK_SET) == -1)
-	{
-		perror("ReadMessage lseek");
-		return -1;
-	}
-
-	gpsMessage[pos] = '\0';
-	return pos + 1;
+	// Handle Gps message
+	strncpy(gpsMessage, buffer, endPos); // Without \n
+	gpsMessage[endPos] = '\0';
+	HandleMessage(gpsMessage, endPos);
+	
+	// Adjust the buffer
+	strncpy(buffer, buffer + endPos + 1, startPos + bytesRead - endPos - 1); // SURYA: Whatever is after endpos needs to be dragged to start
+	startPos = startPos + bytesRead - endPos; // SURYA: Bytesread - Endpos becomes startPos
+	return endPos;
 }
 
 void HandleMessage(char* gpsMessage, int messageSize)
@@ -109,18 +91,16 @@ void HandleMessage(char* gpsMessage, int messageSize)
 
 	// Parse message type
 	messageType[5] = '\0';
-	strncpy(messageType, gpsMessage, 5);
-
-	printf("Message Type: %s\n", messageType);
+	strncpy(messageType, gpsMessage + 1, 5);
 
 	if (strcmp(messageType, "GPGLL") == 0)
 	{
 		GpgllHandler(gpsMessage, messageSize);
 	}
-	/*else
+	else
 	{
 		printf("Invalid command!\n");
-	}*/
+	}
 }
 
 void GpgllHandler(char* gpsMessage, int messageSize)

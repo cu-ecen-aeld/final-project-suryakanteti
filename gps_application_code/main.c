@@ -4,8 +4,6 @@
 
 int main()
 {
-	char gpsMessage[MESSAGE_MAX_LENGTH];
-
 	// Open the GPS port
 	int dataFd = OpenPort();
 	if (dataFd == -1)
@@ -14,28 +12,15 @@ int main()
 		return -1;
 	}
 
-	// Get to start of message
-	int rc = GetToValidMessage(dataFd);
-	if (rc == -1)
-	{
-		printf("GetToValidMessage() failed!\n");
-		return -1;
-	}
-
 	while (1)
 	{
-
 		// Read one line
-		int messageSize = ReadMessage(dataFd, gpsMessage);
+		int messageSize = ParseMessages(dataFd);
 		if (messageSize == -1)
 		{
-			printf("ReadMessage() failed!\n");
+			printf("ParseMessages() failed!\n");
 			return -1;
 		}
-
-		// Identify type of message
-		HandleMessage(gpsMessage, messageSize);
-
 	}
 
 

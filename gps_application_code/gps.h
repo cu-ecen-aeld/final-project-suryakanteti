@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#define MESSAGE_MAX_LENGTH 256
+#define MESSAGE_MAX_LENGTH 512
 
 struct gpgll_s {
 
@@ -28,10 +28,8 @@ enum GpsMessageType
 
 int OpenPort();
 
-int ReadMessage(int dataFd, char* gpsMessage);
+int ParseMessages(int dataFd);
 
 void HandleMessage(char* gpsMessage, int messageSize);
-
-int GetToValidMessage(int dataFd);
 
 #endif // !__GPS_H__

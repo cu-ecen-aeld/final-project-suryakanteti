@@ -11,65 +11,80 @@
 
 #define MMA8452Q_FILE "/dev/i2c-2"
 #define MMA8452Q_ADDR 0x1D
-#define WHO_AM_I 0x0D
-#define CTRL_REG 0x2A
-
-uint8_t who_am_i_reg = WHO_AM_I;
-uint8_t ctrl_reg[2] = {CTRL_REG, 0x01};
-uint8_t out_x_msb = 0x01;
 
 
-int main()
+
+void main() 
 {
-
+	// Create I2C bus
+	int i2c_fd;
     int ret_val = 0;
-    uint8_t buf[2];
-    uint8_t reg_val;
-    uint8_t accl[6];
 
-    int acc_x, acc_y, acc_z;     //+/-2g
-
-
-    int i2c_fd = open(MMA8452Q_FILE, O_RDWR);
+	i2c_fd = open(MMA8452Q_FILE, O_RDWR);
     if(i2c_fd < 0)
         perror("open()");
-
-    ret_val = ioctl(i2c_fd, I2C_SLAVE, MMA8452Q_ADDR);
-    if(ret_val < 0)
+	// Get I2C device, MMA8452Q I2C address is 0x1C(28)
+	ret_val = ioctl(i2c_fd, I2C_SLAVE, 0x1C);
+	if(ret_val < 0)
         perror("ioctl()");
-
-    ret_val = write(i2c_fd, ctrl_reg, 2);
+	// Select mode register(0x2A)
+	// Standby mode(0x00)
+	char config[2] = {0};
+	config[0] = 0x2A;
+	config[1] = 0x00;
+	ret_val = write(i2c_fd, config, 2);
     if(ret_val != 2)
         perror("write()");
-    
-    ret_val = write(i2c_fd, &who_am_i_reg, 1);
-    if(ret_val != 1)
+
+	// Select mode register(0x2A)
+	// Active mode(0x01)
+	config[0] = 0x2A;
+	config[1] = 0x01;
+	write(i2c_fd, config, 2);
+	if(ret_val != 2)
         perror("write()");
+	// Select configuration register(0x0E)
+	// Set range to +/- 2g(0x00)
+	config[0] = 0x0E;
+	config[1] = 0x00;
+	write(i2c_fd, config, 2);
+    if(ret_val != 2)
+        perror("write()");
+	sleep(0.5);
 
-    ret_val = read(i2c_fd, &buf[0], 1);
-    if(ret_val != 1)
-        perror("read()");
-    
-    printf("Who am I reg: 0x%02X\n", buf[0]);
+	// Read 7 bytes of data(0x00)
+	// staus, xAccl msb, xAccl lsb, yAccl msb, yAccl lsb, zAccl msb, zAccl lsb
+	char reg[1] = {0x01};
+	write(i2c_fd, reg, 1);
+	char data[6] = {0};
+	if(read(i2c_fd, data, 6) != 6)
+	{
+		printf("Error : Input/Output error \n");
+	}
+	else
+	{
+		// Convert the data to 12-bits
+		int xAccl = ((data[0] * 256) + data[1]) / 16;
+		if(xAccl > 2047)
+		{
+			xAccl -= 4096;
+		}
 
-    // while(1){
+		int yAccl = ((data[2] * 256) + data[3]) / 16;
+		if(yAccl > 2047)
+		{
+			yAccl -= 4096;
+		}
 
-        ret_val = write(i2c_fd, &out_x_msb, 1);
-        if(ret_val != 1)
-            perror("write()");
+		int zAccl = ((data[4] * 256) + data[5]) / 16;
+		if(zAccl > 2047)
+		{
+			zAccl -= 4096;
+		}
 
-        ret_val = read(i2c_fd, accl, sizeof(accl));
-        if(ret_val != sizeof(accl))
-            perror("read()");
-
-        acc_x = (accl[0] << 8) | accl[1];
-        acc_y = (accl[2] << 8) | accl[3];
-        acc_z = (accl[4] << 8) | accl[5];
-
-        printf("X: %d, Y: %d, Z: %d\r\n", acc_x/1024, acc_y/1024, acc_y/1024);
-
-    // }
-
-    return 0;
-
+		// Output data to screen
+		printf("Acceleration in X-Axis : %d \n", xAccl);
+		printf("Acceleration in Y-Axis : %d \n", yAccl);
+		printf("Acceleration in Z-Axis : %d \n", zAccl);
+	}
 }

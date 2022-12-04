@@ -82,6 +82,7 @@ void GpgllHandler(char* gpsMessage, int messageSize)
 	// 8 fields including the message type
 	int pos1, pos2;
 	struct gpgll_s msgObj;
+	msgObj.dataStatus = true;
 
 	// Field 2: Latitude
 	pos1 = FindCharacter(gpsMessage, messageSize, ',', 1); // End of field 1

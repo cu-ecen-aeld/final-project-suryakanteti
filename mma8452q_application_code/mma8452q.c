@@ -1,82 +1,72 @@
-// Distributed with a free-will license.
-// Use it any way you want, profit or free, provided it fits in the licenses of its associated works.
-// MMA8452Q
-// This code is designed to work with the MMA8452Q_I2CS I2C Mini Module available from ControlEverything.com.
-// https://www.controleverything.com/content/Accelorometer?sku=MMA8452Q_I2CS#tabs-0-product_tabset-2
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <syslog.h>
 #include <unistd.h>
+#include <errno.h>
+#include <stdint.h>
 
-void main() 
+
+#define MMA8452Q_FILE "/dev/i2c-2"
+#define MMA8452Q_ADDR 0x1D
+#define WHO_AM_I 0x0D
+#define CTRL_REG 0x2A
+
+uint8_t who_am_i_reg = WHO_AM_I;
+uint8_t ctrl_reg[2] = {CTRL_REG, 0x01};
+uint8_t out_x_msb = 0x01;
+
+
+int main()
 {
-	// Create I2C bus
-	int file;
-	char *bus = "/dev/i2c-2";
-	if((file = open(bus, O_RDWR)) < 0) 
-	{
-		printf("Failed to open the bus. \n");
-		exit(1);
-	}
-	// Get I2C device, MMA8452Q I2C address is 0x1C(28)
-	ioctl(file, I2C_SLAVE, 0x1D);
-	
-	// Select mode register(0x2A)
-	// Standby mode(0x00)
-	char config[2] = {0};
-	config[0] = 0x2A;
-	config[1] = 0x00;
-	write(file, config, 2);
 
-	// Select mode register(0x2A)
-	// Active mode(0x01)
-	config[0] = 0x2A;
-	config[1] = 0x01;
-	write(file, config, 2);
-	
-	// Select configuration register(0x0E)
-	// Set range to +/- 2g(0x00)
-	config[0] = 0x0E;
-	config[1] = 0x00;
-	write(file, config, 2);
-	sleep(0.5);
+    int ret_val = 0;
+    uint8_t buf[2];
+    uint8_t reg_val;
+    uint8_t accl[6];
 
-	// Read 7 bytes of data(0x00)
-	// staus, xAccl msb, xAccl lsb, yAccl msb, yAccl lsb, zAccl msb, zAccl lsb
-	char reg[1] = {0x00};
-	write(file, reg, 1);
-	char data[7] = {0};
-	if(read(file, data, 7) != 7)
-	{
-		printf("Error : Input/Output error \n");
-	}
-	else
-	{
-		// Convert the data to 12-bits
-		int xAccl = ((data[1] * 256) + data[2]) / 16;
-		if(xAccl > 2047)
-		{
-			xAccl -= 4096;
-		}
+    int16_t acc_x, acc_y, acc_z;     //+/-2g
 
-		int yAccl = ((data[3] * 256) + data[4]) / 16;
-		if(yAccl > 2047)
-		{
-			yAccl -= 4096;
-		}
 
-		int zAccl = ((data[5] * 256) + data[6]) / 16;
-		if(zAccl > 2047)
-		{
-			zAccl -= 4096;
-		}
+    int i2c_fd = open(MMA8452Q_FILE, O_RDWR);
+    if(i2c_fd < 0)
+        perror("open()");
 
-		// Output data to screen
-		printf("Acceleration in X-Axis : %d \n", xAccl);
-		printf("Acceleration in Y-Axis : %d \n", yAccl);
-		printf("Acceleration in Z-Axis : %d \n", zAccl);
-	}
+    int addr = 0x1D;
+    ret_val = ioctl(i2c_fd, I2C_SLAVE, addr);
+    if(ret_val < 0)
+        perror("ioctl()");
+    
+    ret_val = write(i2c_fd, &who_am_i_reg, 1);
+    if(ret_val != 1)
+        perror("write()");
+
+    ret_val = read(i2c_fd, &buf[0], 1);
+    if(ret_val != 1)
+        perror("read()");
+    
+    printf("Who am I reg: 0x%02X  Who am I: (int) %d\n", buf[0], buf[0]);
+
+    ret_val = write(i2c_fd, &ctrl_reg, 2);
+    if(ret_val != 2)
+        perror("write()");
+
+    // while(1){
+
+        ret_val = read(i2c_fd, accl, sizeof(accl));
+        if(ret_val != sizeof(accl))
+            perror("read()");
+
+        acc_x = (accl[0] << 8) | accl[1];
+        acc_y = (accl[2] << 8) | accl[3];
+        acc_z = (accl[4] << 8) | accl[5];
+
+        printf("X: %d, Y: %d, Z: %d\r\n", acc_x/1024, acc_y/1024, acc_y/1024);
+
+    // }
+
+    return 0;
+
 }

@@ -45,7 +45,7 @@ struct addrinfo hints;
 socklen_t address_len=sizeof(struct sockaddr);
 socklen_t addr_size=sizeof(client_addr);
 int sockfd,new_sockfd,s_send;
-message="Hello";
+message="4000.81269 N 0515.92189 W 234942.00";
 if(((sockfd=socket(PF_INET,SOCK_STREAM,0)))==-1){
     syslog(LOG_USER, "Not able to create socket");
     perror("socket");
@@ -87,7 +87,8 @@ if(new_sockfd==-1){
 }
 syslog(LOG_USER, "Accepted Connection");
 inet_ntop(AF_INET,&client_addr,clientIP,sizeof(clientIP));
-    if((s_send=send(new_sockfd,message,(sizeof(message)/sizeof(char)),0))<0){
+    syslog(LOG_USER, "Sending message:%s",message);
+    if((s_send=send(new_sockfd,message,(strlen(message)/sizeof(char)),0))<0){
         syslog(LOG_USER, "Sending failed"); 
     } 
 } 

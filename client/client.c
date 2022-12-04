@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include<stdio.h>
+#include"parser.h"
 
 #define PORT   (9000)
 #define IPV4_ADRESS ("192.168.0.1")
@@ -28,8 +29,8 @@ int main(){
 int sockfd;
 int ret=-1;
 struct sockaddr_in server;
+//char* packet_recieved=(char*)malloc(1024*sizeof(char));
 char packet_recieved[1024];
-
 signal (SIGTERM, signal_handler);
 signal (SIGINT, signal_handler);
 
@@ -46,15 +47,19 @@ server.sin_port=htons(PORT);
 while(ret<0){
     ret=connect(sockfd,(struct sockaddr*)&server,sizeof(server));
 }
-while(!interrupted){ 
+//while(!interrupted){ 
 while(ret<0){
     ret=connect(sockfd,(struct sockaddr*)&server,sizeof(server));
 }    
 if(recv(sockfd,packet_recieved,1024,0)<0){
      syslog(LOG_USER, "Reciving failed");
 }
-else
+else{
 syslog(LOG_USER, "Recieved string");
+syslog(LOG_USER, "Recieved string is:%s",packet_recieved);
+parse(packet_recieved);
+memset(packet_recieved,0,sizeof(packet_recieved));
 }
+//}
 close(sockfd);
 }

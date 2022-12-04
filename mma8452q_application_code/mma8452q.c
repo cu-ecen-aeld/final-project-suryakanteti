@@ -12,8 +12,6 @@
 #define MMA8452Q_FILE "/dev/i2c-2"
 #define MMA8452Q_ADDR 0x1D
 
-
-
 void main() 
 {
 	// Create I2C bus
@@ -23,8 +21,8 @@ void main()
 	i2c_fd = open(MMA8452Q_FILE, O_RDWR);
     if(i2c_fd < 0)
         perror("open()");
-	// Get I2C device, MMA8452Q I2C address is 0x1C(28)
-	ret_val = ioctl(i2c_fd, I2C_SLAVE, 0x1C);
+	// Get I2C device, MMA8452Q I2C address is 0x1D(29)
+	ret_val = ioctl(i2c_fd, I2C_SLAVE, MMA8452Q_ADDR);
 	if(ret_val < 0)
         perror("ioctl()");
 	// Select mode register(0x2A)
@@ -52,8 +50,8 @@ void main()
         perror("write()");
 	sleep(0.5);
 
-	// Read 7 bytes of data(0x00)
-	// staus, xAccl msb, xAccl lsb, yAccl msb, yAccl lsb, zAccl msb, zAccl lsb
+	// Read 6 bytes of data(0x01)
+	// xAccl msb, xAccl lsb, yAccl msb, yAccl lsb, zAccl msb, zAccl lsb
 	char reg[1] = {0x01};
 	write(i2c_fd, reg, 1);
 	char data[6] = {0};

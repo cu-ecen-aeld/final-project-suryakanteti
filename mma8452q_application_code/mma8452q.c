@@ -22,7 +22,7 @@ int main()
 {
 
     int ret_val = 0;
-    int who_am_i_reg = 0x0D;
+    uint8_t who_am_i_reg = 0x0D;
     uint8_t buf[2];
     uint8_t reg_val;
     uint8_t accl[6];
@@ -36,8 +36,12 @@ int main()
 
     ret_val = ioctl(i2c_fd, I2C_SLAVE, MMA8452Q_ADDR);
     if(ret_val < 0)
-    perror("ioctl()");
+        perror("ioctl()");
 
+    ret_val = write(i2c_fd, &ctrl_reg, 2);
+    if(ret_val != 2)
+        perror("write()");
+    
     ret_val = write(i2c_fd, &who_am_i_reg, 1);
     if(ret_val != 1)
         perror("write()");
@@ -46,10 +50,7 @@ int main()
     if(ret_val != 1)
         perror("read()");
     
-    //reg_val = buf[1] | (buf[0] << 8);
-    //reg_val = buf[0];
-    
-    printf("Who am I reg: 0x%02X\n", buf[0]);
+    printf("Who am I reg: 0x%02X  Who am I: (int) %d\n", buf[0], buf[0]);
 
     // ret_val = write(i2c_fd, &ctrl_reg, 1);
     // if(ret_val != sizeof(ctrl_reg))

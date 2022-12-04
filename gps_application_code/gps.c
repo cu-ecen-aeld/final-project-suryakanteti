@@ -8,12 +8,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#define ssize_t int
+//#define ssize_t int
 
 #define GPS_FILE "/dev/hw_serial-48022000"
 //#define GPS_FILE "gps_output.txt"
 
 int startPos = 0;
+struct gpgll_s msgObj;
 
 void GpgllHandler(char* gpsMessage, int messageSize);
 void PrintGpgllMesg(struct gpgll_s* msgPtr);
@@ -81,7 +82,6 @@ void GpgllHandler(char* gpsMessage, int messageSize)
 {
 	// 8 fields including the message type
 	int pos1, pos2;
-	struct gpgll_s msgObj;
 	msgObj.dataStatus = true;
 
 	// Field 2: Latitude
@@ -162,6 +162,10 @@ void GpgllHandler(char* gpsMessage, int messageSize)
 
 	// Print the message
 	PrintGpgllMesg(&msgObj);
+
+	// Populate a string
+	char serialMsg[MESSAGE_MAX_LENGTH];
+	PopulateGpsData(serialMsg, MESSAGE_MAX_LENGTH);
 }
 
 void PrintGpgllMesg(struct gpgll_s* msgPtr)
@@ -180,4 +184,53 @@ void PrintGpgllMesg(struct gpgll_s* msgPtr)
 	{
 		printf("Invalid data!\n");
 	}
+}
+
+int PopulateGpsData(char* buffer, int size)
+{
+	if (buffer == NULL || size <= 0)
+		return -1;
+
+	// Populate a dummy string
+	char temp[MESSAGE_MAX_LENGTH];
+	char* tmpPtr = temp;
+
+	if (msgObj.dataStatus == true)
+	{
+
+		// Latitude
+		strncpy(tmpPtr, msgObj.latitude, strlen(msgObj.latitude));
+		tmpPtr += strlen(msgObj.latitude);
+		*tmpPtr++ = ',';
+
+		// Latitude direction
+		*tmpPtr++ = msgObj.latitudeDir;
+		*tmpPtr++ = ',';
+
+		// Longitude
+		strncpy(tmpPtr, msgObj.longitude, strlen(msgObj.longitude));
+		tmpPtr += strlen(msgObj.longitude);
+		*tmpPtr++ = ',';
+
+		// Longitude direction
+		*tmpPtr++ = msgObj.longitudeDir;
+
+		*tmpPtr = '\0';
+
+		if (strlen(temp) > size)
+		{
+			printf("Not enough space in buffer to populate GPS data!\n");
+			return -1;
+		}
+		else
+		{
+			strncpy(buffer, temp, strlen(temp));
+		}
+	}
+	else
+	{
+		strncpy(buffer, ",,,,\0", 5 * sizeof(char));
+	}
+	
+	return strlen(buffer);
 }

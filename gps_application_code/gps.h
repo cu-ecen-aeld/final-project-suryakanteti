@@ -32,4 +32,6 @@ int ReadMessage(int dataFd);
 
 void HandleMessage(char* gpsMessage, int messageSize);
 
+int PopulateGpsData(char* buffer, int length);
+
 #endif // !__GPS_H__

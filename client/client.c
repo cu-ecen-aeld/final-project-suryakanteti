@@ -13,7 +13,7 @@
 #include"parser.h"
 
 #define PORT   (9000)
-#define IPV4_ADRESS ("192.168.0.1")
+#define IPV4_ADRESS ("127.0.0.1")
 bool interrupted=false;
 
 static void signal_handler (int signo)

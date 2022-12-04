@@ -4,14 +4,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-//#include <unistd.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 
 #define ssize_t int
 
-//#define GPS_FILE "/dev/hw_serial-48022000"
-#define GPS_FILE "gps_output.txt"
+#define GPS_FILE "/dev/hw_serial-48022000"
+//#define GPS_FILE "gps_output.txt"
 
 int startPos = 0;
 

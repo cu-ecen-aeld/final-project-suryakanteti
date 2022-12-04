@@ -18,7 +18,8 @@ void main()
 	int i2c_fd;
     int ret_val = 0;
 
-	i2c_fd = open(MMA8452Q_FILE, O_RDWR);
+    char *bus = "/dev/i2c-2";
+	i2c_fd = open(bus, O_RDWR);
     if(i2c_fd < 0)
         perror("open()");
 	// Get I2C device, MMA8452Q I2C address is 0x1D(29)
@@ -52,29 +53,29 @@ void main()
 
 	// Read 6 bytes of data(0x01)
 	// xAccl msb, xAccl lsb, yAccl msb, yAccl lsb, zAccl msb, zAccl lsb
-	char reg[1] = {0x01};
+	char reg[1] = {0x00};
 	write(i2c_fd, reg, 1);
-	char data[6] = {0};
-	if(read(i2c_fd, data, 6) != 6)
+	char data[7] = {0};
+	if(read(i2c_fd, data, 7) != 7)
 	{
 		printf("Error : Input/Output error \n");
 	}
 	else
 	{
 		// Convert the data to 12-bits
-		int xAccl = ((data[0] * 256) + data[1]) / 16;
+		int xAccl = ((data[1] * 256) + data[2]) / 16;
 		if(xAccl > 2047)
 		{
 			xAccl -= 4096;
 		}
 
-		int yAccl = ((data[2] * 256) + data[3]) / 16;
+		int yAccl = ((data[3] * 256) + data[4]) / 16;
 		if(yAccl > 2047)
 		{
 			yAccl -= 4096;
 		}
 
-		int zAccl = ((data[4] * 256) + data[5]) / 16;
+		int zAccl = ((data[5] * 256) + data[6]) / 16;
 		if(zAccl > 2047)
 		{
 			zAccl -= 4096;

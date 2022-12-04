@@ -27,17 +27,20 @@ int main()
     uint8_t reg_val;
     uint8_t accl[6];
 
-    int16_t acc_x, acc_y, acc_z;     //+/-2g
+    int acc_x, acc_y, acc_z;     //+/-2g
 
 
     int i2c_fd = open(MMA8452Q_FILE, O_RDWR);
     if(i2c_fd < 0)
         perror("open()");
 
-    int addr = 0x1D;
-    ret_val = ioctl(i2c_fd, I2C_SLAVE, addr);
+    ret_val = ioctl(i2c_fd, I2C_SLAVE, MMA8452Q_ADDR);
     if(ret_val < 0)
         perror("ioctl()");
+
+    ret_val = write(i2c_fd, ctrl_reg, 2);
+    if(ret_val != 2)
+        perror("write()");
     
     ret_val = write(i2c_fd, &who_am_i_reg, 1);
     if(ret_val != 1)
@@ -47,13 +50,13 @@ int main()
     if(ret_val != 1)
         perror("read()");
     
-    printf("Who am I reg: 0x%02X  Who am I: (int) %d\n", buf[0], buf[0]);
-
-    ret_val = write(i2c_fd, &ctrl_reg, 2);
-    if(ret_val != 2)
-        perror("write()");
+    printf("Who am I reg: 0x%02X\n", buf[0]);
 
     // while(1){
+
+        ret_val = write(i2c_fd, &out_x_msb, 1);
+        if(ret_val != 1)
+            perror("write()");
 
         ret_val = read(i2c_fd, accl, sizeof(accl));
         if(ret_val != sizeof(accl))

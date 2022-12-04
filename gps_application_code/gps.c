@@ -58,7 +58,7 @@ int ReadMessage(int dataFd)
 		msgPtr++;
 	}
 
-	printf("GPS Message: %s\n", gpsMessage);
+	//printf("GPS Message: %s\n", gpsMessage);
 	HandleMessage(gpsMessage, totalBytesRead);
 	return totalBytesRead;
 }
@@ -75,10 +75,6 @@ void HandleMessage(char* gpsMessage, int messageSize)
 	{
 		GpgllHandler(gpsMessage, messageSize);
 	}
-	else
-	{
-		printf("Invalid command!\n");
-	}
 }
 
 void GpgllHandler(char* gpsMessage, int messageSize)
@@ -87,45 +83,100 @@ void GpgllHandler(char* gpsMessage, int messageSize)
 	int pos1, pos2;
 	struct gpgll_s msgObj;
 
-	// Field 2
+	// Field 2: Latitude
 	pos1 = FindCharacter(gpsMessage, messageSize, ',', 1); // End of field 1
-	pos2 = FindCharacter(gpsMessage, messageSize, '.', 1);
+	pos2 = FindCharacter(gpsMessage, messageSize, ',', 2);
 
-	strncpy(msgObj.latitude, gpsMessage + pos1 + 1, pos2 - pos1 + 2); // Upto 2 decimal points
-	msgObj.latitude[pos2 - pos1 + 2] = '\0';
+	if (pos2 == pos1 + 1)
+	{
+		*msgObj.latitude = '\0';
+		msgObj.dataStatus = false;
+	}
+	else
+	{
+		strncpy(msgObj.latitude, gpsMessage + pos1 + 1, pos2 - pos1 - 1);
+	}
 
-	// Field 3
-	pos1 = FindCharacter(gpsMessage, messageSize, ',', 2); // End of field 2 
-	msgObj.latitudeDir = *(gpsMessage + pos1 + 1);
+	msgObj.latitude[pos2 - pos1 - 1] = '\0';
 
-	// Field 4
-	pos1 = FindCharacter(gpsMessage, messageSize, ',', 3);
-	pos2 = FindCharacter(gpsMessage, messageSize, '.', 2);
+	// Field 3: :Latitude Direction
+	pos1 = FindCharacter(gpsMessage, messageSize, ',', 2); // End of field 2
+	pos2 = FindCharacter(gpsMessage, messageSize, ',', 3);
 
-	strncpy(msgObj.longitude, gpsMessage + pos1 + 1, pos2 - pos1 + 2); // 2 decimal ponits
-	msgObj.longitude[pos2 - pos1 + 2] = '\0';
+	if (pos2 == pos1 + 1)
+	{
+		msgObj.latitudeDir = '\0';
+		msgObj.dataStatus = false;
+	}
+	else
+	{
+		msgObj.latitudeDir = *(gpsMessage + pos1 + 1);
+	}
 
-	// Field 5
-	pos1 = FindCharacter(gpsMessage, messageSize, ',', 4); // End of field 4 
-	msgObj.longitudeDir = *(gpsMessage + pos1 + 1);
+	// Field 4: Longitude
+	pos1 = FindCharacter(gpsMessage, messageSize, ',', 3); // End of field 3
+	pos2 = FindCharacter(gpsMessage, messageSize, ',', 4);
 
-	// Field 6
-	pos1 = FindCharacter(gpsMessage, messageSize, ',', 5); // End of field 5
-	pos2 = FindCharacter(gpsMessage, messageSize, ',', 6);
+	if (pos2 == pos1 + 1)
+	{
+		*msgObj.longitude = '\0';
+		msgObj.dataStatus = false;
+	}
+	else
+	{
+		strncpy(msgObj.longitude, gpsMessage + pos1 + 1, pos2 - pos1 - 1);
+	}
 
-	strncpy(msgObj.utc, gpsMessage + pos1 + 1, pos2 - pos1 - 1);
+	msgObj.longitude[pos2 - pos1 - 1] = '\0';
+
+	// Field 5: Longitude Direction
+	pos1 = FindCharacter(gpsMessage, messageSize, ',', 4); // End of field 4
+	pos2 = FindCharacter(gpsMessage, messageSize, ',', 5);
+
+	if (pos2 == pos1 + 1)
+	{
+		msgObj.longitudeDir = '\0';
+		msgObj.dataStatus = false;
+	}
+	else
+	{
+		msgObj.longitudeDir = *(gpsMessage + pos1 + 1);
+	}
+
+	// Field 6: UTC
+	pos1 = FindCharacter(gpsMessage, messageSize, ',', 4); // End of field 5
+	pos2 = FindCharacter(gpsMessage, messageSize, ',', 5);
+
+	if (pos2 == pos1 + 1)
+	{
+		*msgObj.utc = '\0';
+		msgObj.dataStatus = false;
+	}
+	else
+	{
+		strncpy(msgObj.utc, gpsMessage + pos1 + 1, pos2 - pos1 - 1);
+	}
+
 	msgObj.utc[pos2 - pos1 - 1] = '\0';
 
+	// Print the message
 	PrintGpgllMesg(&msgObj);
 }
 
 void PrintGpgllMesg(struct gpgll_s* msgPtr)
 {
-	printf("Latitude: %s\n", msgPtr->latitude);
-	printf("Latitude Direction: %c\n", msgPtr->latitudeDir);
+	if (msgPtr->dataStatus != false)
+	{
+		printf("\nLatitude: %s\n", msgPtr->latitude);
+		printf("Latitude Direction: %c\n", msgPtr->latitudeDir);
 
-	printf("Longitude: %s\n", msgPtr->longitude);
-	printf("Longitude Direction: %c\n", msgPtr->longitudeDir);
+		printf("Longitude: %s\n", msgPtr->longitude);
+		printf("Longitude Direction: %c\n", msgPtr->longitudeDir);
 
-	printf("UTC: %s\n", msgPtr->utc);
+		printf("UTC: %s\n\n", msgPtr->utc);
+	}
+	else
+	{
+		printf("Invalid data!\n");
+	}
 }

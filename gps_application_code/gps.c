@@ -145,8 +145,8 @@ void GpgllHandler(char* gpsMessage, int messageSize)
 	}
 
 	// Field 6: UTC
-	pos1 = FindCharacter(gpsMessage, messageSize, ',', 4); // End of field 5
-	pos2 = FindCharacter(gpsMessage, messageSize, ',', 5);
+	pos1 = FindCharacter(gpsMessage, messageSize, ',', 5); // End of field 5
+	pos2 = FindCharacter(gpsMessage, messageSize, ',', 6);
 
 	if (pos2 == pos1 + 1)
 	{

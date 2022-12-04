@@ -1,15 +1,19 @@
-SRC1 := client.c
-SRC2 :=  parser.c
-TARGET = client
-#OBJS := $(SRC:.c=.o)
+#selecting complier
+CROSS_COMPILE=
+CC ?=$(CROSS_COMPILE)gcc
 
-CC=gcc
-LDFLAGS= -pthread  -lpthread
+#selecting Targer file
+TARGET ?= client
 
-all: client
 
-$(TARGET) : $(OBJS)
-	$(CROSS_COMPILE)$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) $(SRC1) $(SRC2) -o $(TARGET) $(LDFLAGS)
+#selecting all needed source files
+SRC_FILES = $(TARGET).c parser.c
 
+all: $(TARGET)
+#clean:
+#	rm -f *.o writer
+
+$(TARGET): $(TARGET).c
+	$(CC) $(CFLAGS) $(SRC_FILES) -o $(TARGET) $(LDFLAGS)
 clean:
-	-rm -f *.o $(TARGET) *.elf *.map
+	rm -f *.o $(TARGET)

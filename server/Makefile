@@ -1,14 +1,18 @@
-SRC := socket.c
-TARGET = socket
-#OBJS := $(SRC:.c=.o)
+#selecting complier
+CROSS_COMPILE=
+CC ?=$(CROSS_COMPILE)gcc
 
-CC=gcc
-LDFLAGS= -pthread  -lpthread
+#selecting Targer file
+TARGET ?= server
 
-all: socket
+#selecting all needed source files
+SRC_FILES = server.c
 
-$(TARGET) : $(OBJS)
-	$(CROSS_COMPILE)$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) $(SRC) -o $(TARGET) $(LDFLAGS)
+all: $(TARGET)
+#clean:
+#	rm -f *.o writer
 
+$(TARGET): $(TARGET).c
+	$(CC) $(CFLAGS) $(SRC_FILES) -o $(TARGET) $(LDFLAGS)
 clean:
-	-rm -f *.o $(TARGET) *.elf *.map
+	rm -f *.o $(TARGET)

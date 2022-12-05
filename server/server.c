@@ -91,36 +91,34 @@ freeaddrinfo(server_info);
 syslog(LOG_USER, "Listening");
 listen(sockfd,BACKLOG);
 
+new_sockfd=accept(sockfd,&client_addr,&addr_size);
+
+if(new_sockfd==-1)
+{
+    syslog(LOG_USER, "Error while accepting");
+    perror("accept");
+    close(sockfd);
+    return(-1);
+}
+
+syslog(LOG_USER, "Accepted Connection");
+inet_ntop(AF_INET,&client_addr,clientIP,sizeof(clientIP));
+
 char sensorData[SENSOR_DATA_LENGTH];
 
 while(!interrupted)
 { 
-    new_sockfd=accept(sockfd,&client_addr,&addr_size);
-
-    if(new_sockfd==-1)
-    {
-        syslog(LOG_USER, "Error while accepting");
-        perror("accept");
-        close(sockfd);
-        return(-1);
-    }
-
-    syslog(LOG_USER, "Accepted Connection");
-    inet_ntop(AF_INET,&client_addr,clientIP,sizeof(clientIP));
-    syslog(LOG_USER, "Sending message:%s",message);
-
     // Populate the sensor data
     int gpsBytes = PopulateGpsData(gpsFd, sensorData, SENSOR_DATA_LENGTH);
-    sensorData[gpsBytes] = ',';
+    sensorData[gpsBytes] = ' ';
     int acclBytes = populate_accl_data(sensorData + gpsBytes + 1, SENSOR_DATA_LENGTH - gpsBytes - 1, acclFd);
-    sensorData[gpsBytes + acclBytes + 1] = '\n';
-    sensorData[gpsBytes + acclBytes + 2] = '\0';
+    sensorData[gpsBytes + acclBytes + 1] = '\0';
 
     if((s_send=send(new_sockfd,sensorData,(strlen(sensorData)/sizeof(char)),0))<0)
     {
         syslog(LOG_USER, "Sending failed"); 
     }
-    
+      
 } 
 close(sockfd);          
 }

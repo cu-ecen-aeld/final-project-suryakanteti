@@ -28,10 +28,8 @@ enum GpsMessageType
 
 int OpenPort();
 
-int ReadMessage(int dataFd);
+int PopulateGpsData(int dataFd, char* buffer, int length);
 
-void HandleMessage(char* gpsMessage, int messageSize);
-
-int PopulateGpsData(char* buffer, int length);
+void PrintGpgllMesg(struct gpgll_s* msgPtr);
 
 #endif // !__GPS_H__

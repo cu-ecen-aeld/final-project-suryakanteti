@@ -4,7 +4,8 @@
 
 int main()
 {
-	// Open the GPS port
+	char temp[MESSAGE_MAX_LENGTH];
+
 	int dataFd = OpenPort();
 	if (dataFd == -1)
 	{
@@ -14,19 +15,8 @@ int main()
 
 	while (1)
 	{
-		// Read one line
-		int messageSize = ReadMessage(dataFd);
-		if (messageSize == -1)
-		{
-			printf("ReadMessage() failed!\n");
-			return -1;
-		}
+		PopulateGpsData(dataFd, temp, MESSAGE_MAX_LENGTH);
 	}
-
-
-	// Parse to form a structure and return it...maybe only important things
-	// Display the structure
-	// On the client side, to get it, we might have to serialize data and de-serialize it
 
 	return 0;
 }

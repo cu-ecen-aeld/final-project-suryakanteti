@@ -9,9 +9,10 @@ char accl_data[50];
 
 int main()
 {
-    populate_accl_data(accl_data, 50);
+    int fd = open_i2c_port();
+    populate_accl_data(accl_data, 50, fd);
 
-    printf("%s", accl_data);
+    printf("%s\n", accl_data);
 
     return 0;
 }

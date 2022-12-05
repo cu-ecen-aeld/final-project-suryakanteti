@@ -16,10 +16,10 @@
 
 char accl_string[50];
 
-size_t populate_accl_data(void *buf, size_t n)
+size_t populate_accl_data(void *buf, size_t n, int i2c_fd)
 {
     int num_of_bytes = 0;
-    num_of_bytes = get_accl_x_y_z();
+    num_of_bytes = get_accl_x_y_z(i2c_fd);
     if(n < num_of_bytes)
     {
         printf("Buffer full\n");
@@ -35,13 +35,10 @@ size_t populate_accl_data(void *buf, size_t n)
     return i+1;
 }
 
-int get_accl_x_y_z()
+int open_i2c_port()
 {
-	// Create I2C bus
-	int i2c_fd;
+    int i2c_fd;
     int ret_val = 0;
-    int num_of_bytes = 0;
-
     char *bus = "/dev/i2c-2";
 	i2c_fd = open(bus, O_RDWR);
     if(i2c_fd < 0)
@@ -50,6 +47,16 @@ int get_accl_x_y_z()
 	ret_val = ioctl(i2c_fd, I2C_SLAVE, MMA8452Q_ADDR);
 	if(ret_val < 0)
         perror("ioctl()");
+
+    return i2c_fd;
+}
+
+int get_accl_x_y_z(int i2c_fd)
+{
+	// Create I2C bus
+    int ret_val = 0;
+    int num_of_bytes = 0;
+
 	// Select mode register(0x2A)
 	// Standby mode(0x00)
 	char config[2] = {0};
@@ -113,6 +120,7 @@ int get_accl_x_y_z()
 	}
 
     return num_of_bytes;
+
 }
 
 

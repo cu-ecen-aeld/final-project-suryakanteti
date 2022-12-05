@@ -23,7 +23,7 @@ void parse(char* packet)
     printf("Latitude: %lf\n", gpsData.lat);
     printf("Latitude Direction: %c\n", gpsData.lat_direction);
     printf("Longitude: %lf\n", gpsData.lon);
-    printf("Longitude Direction: %c\n", gpsData.lat_direction);
+    printf("Longitude Direction: %c\n", gpsData.lon_direction);
     printf("UTC Time: %lf\n\n", gpsData.utc);
 
     // Accelerometer data

@@ -6,7 +6,7 @@ void tokenize(char* packet, gps_data_t* gps, accelerometer_data_t* accl)
 {
     int ret;
     ret = sscanf(packet,
-                 "%s,%c,%s,%c,%s,X: %d, Y: %d, Z: %d\n",
+                 "%lf,%c,%lf,%c,%lf,X: %d, Y: %d, Z: %d\n",
                  &gps->lat, &gps->lat_direction, &gps->lon, &gps->lon_direction, &gps->utc,
                  &accl->x_value, &accl->y_value, &accl->z_value);
 }
@@ -20,11 +20,11 @@ void parse(char* packet)
     tokenize(packet, &gpsData, &acclData);
 
     // GPS data
-    printf("Latitude: %s\n", gpsData.lat);
+    printf("Latitude: %lf\n", gpsData.lat);
     printf("Latitude Direction: %s\n", gpsData.lat_direction);
-    printf("Longitude: %s\n", gpsData.lon);
+    printf("Longitude: %lf\n", gpsData.lon);
     printf("Longitude Direction: %s\n", gpsData.lat_direction);
-    printf("UTC Time: %s\n\n", gpsData.utc);
+    printf("UTC Time: %lf\n\n", gpsData.utc);
 
     // Accelerometer data
     printf("Acceleration in X-axis: %d\n", acclData.x_value);

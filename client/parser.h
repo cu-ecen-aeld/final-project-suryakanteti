@@ -1,10 +1,10 @@
 typedef struct {
 
-    char lat[15];
+    double lat;
     char lat_direction;
-    char lon[15];
+    double lon;
     char lon_direction;
-    char utc[15];
+    double utc;
 
 } gps_data_t;
 

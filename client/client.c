@@ -16,7 +16,7 @@
 #define IPV4_ADRESS ("192.168.0.2")
 bool interrupted = false;
 
-static void signal_handler (int signo)
+/*static void signal_handler (int signo)
 {
     if(signo == SIGINT || signo == SIGTERM)
     {   
@@ -24,7 +24,7 @@ static void signal_handler (int signo)
         interrupted=true;   
         exit (EXIT_SUCCESS);  
     } 
-}
+}*/
 
 int main()
 {
@@ -33,8 +33,8 @@ int main()
     struct sockaddr_in server;
     //char* packet_received=(char*)malloc(1024*sizeof(char));
     char packet_received[1024];
-    signal (SIGTERM, signal_handler);
-    signal (SIGINT, signal_handler);
+    //signal (SIGTERM, signal_handler);
+    //signal (SIGINT, signal_handler);
 
     //openlog("aesd-client",LOG_PID|LOG_ERR,LOG_USER); 
     //setlogmask(LOG_UPTO(LOG_DEBUG)); 
@@ -72,6 +72,8 @@ int main()
             syslog(LOG_USER, "Received string is:%s",packet_received);
             parse(packet_received);
             memset(packet_received, 0, sizeof(packet_received));
+
+            sleep(1);
         }
     }
 

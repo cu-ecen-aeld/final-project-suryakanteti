@@ -6,7 +6,7 @@ CC ?=$(CROSS_COMPILE)gcc
 TARGET ?= server
 
 #selecting all needed source files
-SRC_FILES = server.c
+SRC_FILES = server.c ../gps_application_code/gps.c ../gps_application_code/misc.c ../mma8452q_application_code/mma8452q.c
 
 all: $(TARGET)
 #clean:

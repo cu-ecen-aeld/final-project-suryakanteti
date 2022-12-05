@@ -110,9 +110,10 @@ while(!interrupted)
 
     // Populate the sensor data
     int gpsBytes = PopulateGpsData(gpsFd, sensorData, SENSOR_DATA_LENGTH);
-    int acclBytes = populate_accl_data(sensorData + gpsBytes, SENSOR_DATA_LENGTH - gpsBytes, acclFd);
-    sensorData[gpsBytes + acclBytes] = '\0';
-    sensorData[gpsBytes + acclBytes + 1] = '\n';
+    sensorData[gpsBytes] = ',';
+    int acclBytes = populate_accl_data(sensorData + gpsBytes + 1, SENSOR_DATA_LENGTH - gpsBytes, acclFd);
+    sensorData[gpsBytes + acclBytes + 1] = '\0';
+    sensorData[gpsBytes + acclBytes + 2] = '\n';
 
     if((s_send=send(new_sockfd,sensorData,(strlen(sensorData)/sizeof(char)),0))<0)
     {

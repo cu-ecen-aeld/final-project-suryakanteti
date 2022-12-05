@@ -7,16 +7,40 @@
 #include <unistd.h>
 #include <errno.h>
 #include <stdint.h>
+#include "mma8452.h"
 
 
 #define MMA8452Q_FILE "/dev/i2c-2"
 #define MMA8452Q_ADDR 0x1D
 
-void main() 
+
+char accl_string[50];
+
+size_t populate_accl_data(void *buf, size_t n)
+{
+    int num_of_bytes = 0;
+    num_of_bytes = get_accl_x_y_z();
+    if(n < num_of_bytes)
+    {
+        printf("Buffer full\n");
+        return 0;
+    }
+
+    int i;
+    for(i = 0; i < num_of_bytes; i++)
+    {
+        *(char *)(buf+i) = *(accl_string+i);
+    }
+
+    return i+1;
+}
+
+int get_accl_x_y_z()
 {
 	// Create I2C bus
 	int i2c_fd;
     int ret_val = 0;
+    int num_of_bytes = 0;
 
     char *bus = "/dev/i2c-2";
 	i2c_fd = open(bus, O_RDWR);
@@ -85,5 +109,10 @@ void main()
 		printf("Acceleration in X-Axis : %d \n", xAccl);
 		printf("Acceleration in Y-Axis : %d \n", yAccl);
 		printf("Acceleration in Z-Axis : %d \n", zAccl);
+        num_of_bytes = sprintf(accl_string, "X: %d, Y: %d, Z: %d", xAccl, yAccl, zAccl);
 	}
+
+    return num_of_bytes;
 }
+
+

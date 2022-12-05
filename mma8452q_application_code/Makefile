@@ -10,7 +10,7 @@ TARGET ?= mma8452q
 #LDFLAGS ?= -pthread -lrt
 
 #selecting all needed source files
-SRC_FILES = $(TARGET).c
+SRC_FILES = $(TARGET).c main.c
 
 all: $(TARGET)
 #clean:

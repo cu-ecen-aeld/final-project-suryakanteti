@@ -54,6 +54,7 @@ struct addrinfo hints;
 socklen_t address_len=sizeof(struct sockaddr);
 socklen_t addr_size=sizeof(client_addr);
 int sockfd,new_sockfd,s_send;
+
 //message="4000.81269 N 0515.92189 W 234942.00";
 
 // Open sensor ports
@@ -112,18 +113,14 @@ while(!interrupted)
     int gpsBytes = PopulateGpsData(gpsFd, sensorData, SENSOR_DATA_LENGTH);
     sensorData[gpsBytes] = ',';
     int acclBytes = populate_accl_data(sensorData + gpsBytes + 1, SENSOR_DATA_LENGTH - gpsBytes, acclFd);
-    sensorData[gpsBytes + acclBytes + 1] = '\0';
-    sensorData[gpsBytes + acclBytes + 2] = '\n';
+    sensorData[gpsBytes + acclBytes + 1] = '\n';
+    sensorData[gpsBytes + acclBytes + 2] = '\0';
 
     if((s_send=send(new_sockfd,sensorData,(strlen(sensorData)/sizeof(char)),0))<0)
     {
         syslog(LOG_USER, "Sending failed"); 
     }
     
-    /*if((s_send=send(new_sockfd,message,(strlen(message)/sizeof(char)),0))<0)
-    {
-        syslog(LOG_USER, "Sending failed"); 
-    }*/
 } 
 close(sockfd);          
 }

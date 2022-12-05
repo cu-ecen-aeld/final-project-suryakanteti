@@ -51,16 +51,16 @@ int PopulateGpsData(int dataFd, char* buffer, int size)
 		// Latitude
 		strncpy(tmpPtr, msgObj.latitude, strlen(msgObj.latitude));
 		tmpPtr += strlen(msgObj.latitude);
-		*tmpPtr++ = ',';
+		*tmpPtr++ = ' ';
 
 		// Latitude direction
 		*tmpPtr++ = msgObj.latitudeDir;
-		*tmpPtr++ = ',';
+		*tmpPtr++ = ' ';
 
 		// Longitude
 		strncpy(tmpPtr, msgObj.longitude, strlen(msgObj.longitude));
 		tmpPtr += strlen(msgObj.longitude);
-		*tmpPtr++ = ',';
+		*tmpPtr++ = ' ';
 
 		// Longitude direction
 		*tmpPtr++ = msgObj.longitudeDir;
@@ -79,7 +79,7 @@ int PopulateGpsData(int dataFd, char* buffer, int size)
 	}
 	else
 	{
-		strncpy(buffer, ",,,,\0", 5 * sizeof(char));
+		strncpy(buffer, "     ", 5 * sizeof(char));
 	}
 	
 	return strlen(buffer);

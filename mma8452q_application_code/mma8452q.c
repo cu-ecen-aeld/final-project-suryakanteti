@@ -116,7 +116,7 @@ int get_accl_x_y_z(int i2c_fd)
 		printf("Acceleration in X-Axis : %d \n", xAccl);
 		printf("Acceleration in Y-Axis : %d \n", yAccl);
 		printf("Acceleration in Z-Axis : %d \n", zAccl);
-        num_of_bytes = sprintf(accl_string, "%d,%d,%d", xAccl, yAccl, zAccl);
+        num_of_bytes = sprintf(accl_string, "%d %d %d", xAccl, yAccl, zAccl);
 	}
 
     return num_of_bytes;

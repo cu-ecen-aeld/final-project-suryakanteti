@@ -15,7 +15,9 @@ int main()
 
 	while (1)
 	{
-		PopulateGpsData(dataFd, temp, MESSAGE_MAX_LENGTH);
+		int gpsBytes = PopulateGpsData(dataFd, temp, MESSAGE_MAX_LENGTH);
+		temp[gpsBytes] = '\0';
+		printf("GPS String: %s\n", temp);
 	}
 
 	return 0;

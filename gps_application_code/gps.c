@@ -83,7 +83,7 @@ int PopulateGpsData(int dataFd, char* buffer, int size)
 		return 10;
 	}
 	
-	return strlen(buffer);
+	return strlen(temp);
 }
 
 void PrintGpgllMesg(struct gpgll_s* msgPtr)

@@ -79,8 +79,8 @@ int PopulateGpsData(int dataFd, char* buffer, int size)
 	}
 	else
 	{
-		strncpy(buffer, "0 0 0 0 0\0", 10 * sizeof(char));
-		return 10;
+		strncpy(buffer, "0 0 0 0 0", 9 * sizeof(char));
+		return 9;
 	}
 	
 	return strlen(temp);

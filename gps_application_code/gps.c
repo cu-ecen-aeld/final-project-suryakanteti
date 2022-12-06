@@ -64,6 +64,11 @@ int PopulateGpsData(int dataFd, char* buffer, int size)
 
 		// Longitude direction
 		*tmpPtr++ = msgObj.longitudeDir;
+		*tmpPtr++ = ' ';
+
+		// UTC
+		strncpy(tmpPtr, msgObj.utc, strlen(msgObj.utc));
+		tmpPtr += strlen(msgObj.utc);
 
 		*tmpPtr = '\0';
 

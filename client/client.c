@@ -33,6 +33,8 @@ bool interrupted = false;
  * @return None
  * 
 */
+
+/*
 static void signal_handler (int signo)
 {
     if(signo == SIGINT || signo == SIGTERM)
@@ -42,6 +44,8 @@ static void signal_handler (int signo)
         exit (EXIT_SUCCESS);  
     } 
 }
+*/
+
 
 int main()
 {
@@ -49,8 +53,8 @@ int main()
     int ret=-1;
     struct sockaddr_in server;
     char packet_received[1024];
-    signal (SIGTERM, signal_handler);
-    signal (SIGINT, signal_handler);
+    //signal (SIGTERM, signal_handler);
+    //signal (SIGINT, signal_handler);
     
     // Create a socket
     if(((sockfd=socket(PF_INET,SOCK_STREAM,0)))==-1)

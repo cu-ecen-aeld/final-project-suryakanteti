@@ -106,15 +106,30 @@ inet_ntop(AF_INET,&client_addr,clientIP,sizeof(clientIP));
 
 char sensorData[SENSOR_DATA_LENGTH];
 
+char gpsData[100];
+char acclData[100];
+
 while(!interrupted)
 { 
     // Populate the sensor data
     int gpsBytes = PopulateGpsData(gpsFd, sensorData, SENSOR_DATA_LENGTH);
     sensorData[gpsBytes] = ' ';
+
+    strncpy(gpsData, sensorData, gpsBytes);
+    gpsData[gpsBytes] = '\0';
+    printf("GPS data: %s\n", gpsData);
+    printf("GPS bytes: %d\n\n", gpsBytes);
+
     int acclBytes = populate_accl_data(sensorData + gpsBytes + 1, SENSOR_DATA_LENGTH - gpsBytes - 1, acclFd);
+
+    strncpy(acclData, sensorData + gpsBytes + 1, acclBytes);
+    acclData[gpsBytes + acclBytes + 1] = '\0';
+    printf("Accl Data: %s\n", acclData);
+    printf("Accl bytes: %d\n\n", acclBytes);
+
     //sensorData[gpsBytes + acclBytes + 1] = ' ';
     sensorData[gpsBytes + acclBytes + 2] = '\0';
-    printf("%s", sensorData);
+    printf("Sensor Data: %s\n", sensorData);
 
     if((s_send=send(new_sockfd, sensorData, (strlen(sensorData) * sizeof(char)),0))<0)
     {

@@ -20,7 +20,7 @@
 #define PORT   (9000)
 
 // Server address
-#define IPV4_ADRESS ("10.0.0.102")
+#define IPV4_ADRESS ("192.168.1.2")
 
 // Flag to indicate interruption
 bool interrupted = false;

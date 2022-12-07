@@ -104,13 +104,13 @@ if(new_sockfd==-1)
 syslog(LOG_USER, "Accepted Connection");
 inet_ntop(AF_INET,&client_addr,clientIP,sizeof(clientIP));
 
-char sensorData[SENSOR_DATA_LENGTH];
-
-char gpsData[100];
-char acclData[100];
 
 while(!interrupted)
 { 
+    char sensorData[SENSOR_DATA_LENGTH];
+    char gpsData[100];
+    char acclData[100];
+    
     // Populate the sensor data
     int gpsBytes = PopulateGpsData(gpsFd, sensorData, SENSOR_DATA_LENGTH);
     sensorData[gpsBytes] = ' ';

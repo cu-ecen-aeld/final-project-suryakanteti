@@ -114,7 +114,7 @@ while(!interrupted)
     int acclBytes = populate_accl_data(sensorData + gpsBytes + 1, SENSOR_DATA_LENGTH - gpsBytes - 1, acclFd);
     sensorData[gpsBytes + acclBytes + 1] = ' ';
     sensorData[gpsBytes + acclBytes + 2] = '\0';
-
+    printf("%s", sensorData);
 
     if((s_send=send(new_sockfd, sensorData, (strlen(sensorData) * sizeof(char)),0))<0)
     {

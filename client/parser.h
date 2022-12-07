@@ -1,3 +1,7 @@
+/**
+ * Authors: Sona Subair
+ */
+
 // Structure type to store the GPS data
 typedef struct {
 

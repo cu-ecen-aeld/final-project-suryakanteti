@@ -1,3 +1,7 @@
+/**
+ * Authors: Sona Subair, Surya Kanteti
+ */
+
 #include<stdio.h>
 #include<string.h>	//strlen
 #include<sys/socket.h>

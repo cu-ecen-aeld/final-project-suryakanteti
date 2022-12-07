@@ -110,7 +110,7 @@ while(!interrupted)
     char sensorData[SENSOR_DATA_LENGTH];
     char gpsData[100];
     char acclData[100];
-    
+
     // Populate the sensor data
     int gpsBytes = PopulateGpsData(gpsFd, sensorData, SENSOR_DATA_LENGTH);
     sensorData[gpsBytes] = ' ';
@@ -128,10 +128,11 @@ while(!interrupted)
     printf("Accl bytes: %d\n\n", acclBytes);
 
     //sensorData[gpsBytes + acclBytes + 1] = ' ';
-    sensorData[gpsBytes + acclBytes + 1] = '\0';
+    sensorData[gpsBytes + acclBytes + 1] = ' ';
+    sensorData[gpsBytes + acclBytes + 2] = '\0';
     printf("Sensor Data: %s\n", sensorData);
 
-    if((s_send=send(new_sockfd, sensorData, (strlen(sensorData) * sizeof(char)),0))<0)
+    if((s_send=send(new_sockfd, sensorData, ((strlen(sensorData) + 1) * sizeof(char)),0))<0)
     {
         syslog(LOG_USER, "Sending failed"); 
     }

@@ -1,3 +1,7 @@
+/**
+* Author: Surya Kanteti
+*/
+
 #include "gps.h"
 #include "misc.h"
 
@@ -8,14 +12,23 @@
 #include <stdio.h>
 #include <string.h>
 
+// GPS port based on the current driver
 #define GPS_FILE "/dev/hw_serial-48022000"
 
+// Message structure to store GPGLL data
 struct gpgll_s msgObj;
 
+// Functions used within the code but not provided as interfaces
 int ReadMessage(int dataFd);
 void HandleMessage(char* gpsMessage, int messageSize);
 void GpgllHandler(char* gpsMessage, int messageSize);
 
+/**
+ * @brief: Opens the port to read GPS data
+ *
+ * @return File descriptor of the opened port, -1 in case of error
+ * 
+*/
 int OpenPort()
 {
 	int dataFd = open(GPS_FILE, O_RDONLY);
@@ -28,6 +41,16 @@ int OpenPort()
 	return dataFd;
 }
 
+/**
+ * @brief: Populates GPS data into a fixed size buffer
+ *
+ * @param dataFd: File descriptor for GPS data port
+ * @param[out] buffer: Buffer to be filled
+ * @param length: Length of the buffer
+ *
+ * @return Integer indicating the position of the delimiter, -1 if not found
+ * 
+*/
 int PopulateGpsData(int dataFd, char* buffer, int size)
 {
 	if (buffer == NULL || size <= 0)
@@ -91,6 +114,14 @@ int PopulateGpsData(int dataFd, char* buffer, int size)
 	return strlen(temp);
 }
 
+/**
+ * @brief: Prints GPGLL message on the console
+ *
+ * @param msgPtr: Pointer to the GPGLL message structure
+ * 
+ * @return None
+ * 
+*/
 void PrintGpgllMesg(struct gpgll_s* msgPtr)
 {
 	if (msgPtr->dataStatus != false)
@@ -109,6 +140,14 @@ void PrintGpgllMesg(struct gpgll_s* msgPtr)
 	}
 }
 
+/**
+ * @brief: Reads one message from the GPS data
+ *
+ * @param dataFd: File descriptor for GPS data port
+ *
+ * @return Total bytes read, -1 in case of error
+ * 
+*/
 int ReadMessage(int dataFd)
 {
 	char gpsMessage[MESSAGE_MAX_LENGTH];
@@ -141,6 +180,15 @@ int ReadMessage(int dataFd)
 	return totalBytesRead;
 }
 
+/**
+ * @brief: Parses the message and calls the respective handler
+ *
+ * @param gpsMessage: String containing the GPS message
+ * @param messageSize: Size of the GPS message
+ *
+ * @return None
+ * 
+*/
 void HandleMessage(char* gpsMessage, int messageSize)
 {
 	char messageType[6];
@@ -155,6 +203,15 @@ void HandleMessage(char* gpsMessage, int messageSize)
 	}
 }
 
+/**
+ * @brief: Handler for GPGLL messages. Populates the global GPGLL structure
+ *
+ * @param gpsMessage: String containing the GPS message
+ * @param messageSize: Size of the GPS message
+ *
+ * @return None
+ * 
+*/
 void GpgllHandler(char* gpsMessage, int messageSize)
 {
 	// 8 fields including the message type

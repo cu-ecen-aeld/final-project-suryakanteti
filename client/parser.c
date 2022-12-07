@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include "parser.h"
 
+/**
+ * @brief: Parses the packet into provided structures
+ *
+ * @param packet: Received packet in string format
+ * @param[out] gps: Structure pointer to the GPS data
+ * @param[out] accl: Structure pointer to the accelerometer data
+ *
+ * @return None
+ * 
+*/
 void tokenize(char* packet, gps_data_t* gps, accelerometer_data_t* accl)
 {
     int ret;
@@ -11,6 +21,14 @@ void tokenize(char* packet, gps_data_t* gps, accelerometer_data_t* accl)
                  &accl->x_value, &accl->y_value, &accl->z_value);
 }
 
+/**
+ * @brief: Parses the the sensor data and prints on the console
+ *
+ * @param packet: Received packet in string format
+ *
+ * @return File descriptor of the opened port, -1 in case of error
+ * 
+*/
 void parse(char* packet)
 {
     gps_data_t gpsData;

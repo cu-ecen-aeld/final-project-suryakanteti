@@ -128,7 +128,7 @@ while(!interrupted)
     printf("Accl bytes: %d\n\n", acclBytes);
 
     //sensorData[gpsBytes + acclBytes + 1] = ' ';
-    sensorData[gpsBytes + acclBytes + 2] = '\0';
+    sensorData[gpsBytes + acclBytes + 1] = '\0';
     printf("Sensor Data: %s\n", sensorData);
 
     if((s_send=send(new_sockfd, sensorData, (strlen(sensorData) * sizeof(char)),0))<0)

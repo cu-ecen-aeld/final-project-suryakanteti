@@ -32,7 +32,7 @@ size_t populate_accl_data(void *buf, size_t n, int i2c_fd)
         *(char *)(buf+i) = *(accl_string+i);
     }
 
-    return i+1;
+    return i;
 }
 
 int open_i2c_port()

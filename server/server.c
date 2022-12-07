@@ -25,6 +25,7 @@
 #define BUFFER_SIZE (1024)
 struct addrinfo *server_info=NULL;
 bool interrupted=false;
+bool deamon = false;
 
 // Sensor params
 #define SENSOR_DATA_LENGTH 512
@@ -52,6 +53,14 @@ int main(int argc,char* argv[]){
 int tr=1;   
 char clientIP[INET6_ADDRSTRLEN]; 
 char* message;
+
+if (argc >= 2)
+{
+    if (strcmp(argv[1], "-d") == 0)
+    {
+        deamon = true;
+    }
+}
 
 signal (SIGTERM, signal_handler);
 signal (SIGINT, signal_handler);
@@ -96,6 +105,15 @@ if(bind(sockfd,server_info->ai_addr,sizeof(struct sockaddr))<0){
 }
 
 freeaddrinfo(server_info);
+
+if (deamon)
+{
+    int ret = daemon(-1, -1);
+    if (ret == -1)
+    {
+        perror("daemon");
+    }
+}
 syslog(LOG_USER, "Listening");
 listen(sockfd,BACKLOG);
 

@@ -1,5 +1,12 @@
-
-
+/**
+ * @file: mma8452q.h
+ * @brief: Contains application code for mma8452q.c 
+ * @description: This code uses linux/i2c-dev.h https://www.kernel.org/doc/Documentation/i2c/dev-interface
+ *               to perform i2c read write operations. This code sets the sensitivity to +/-2g and reads 
+ *               the X, Y, Z acclerometer values
+ * @author: Peter Braganza
+ * 
+*/
 
 #include <stdint.h>
 #include <stdio.h>

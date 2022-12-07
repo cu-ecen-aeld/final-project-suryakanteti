@@ -112,7 +112,7 @@ while(!interrupted)
     int gpsBytes = PopulateGpsData(gpsFd, sensorData, SENSOR_DATA_LENGTH);
     sensorData[gpsBytes] = ' ';
     int acclBytes = populate_accl_data(sensorData + gpsBytes + 1, SENSOR_DATA_LENGTH - gpsBytes - 1, acclFd);
-    sensorData[gpsBytes + acclBytes + 1] = ' ';
+    //sensorData[gpsBytes + acclBytes + 1] = ' ';
     sensorData[gpsBytes + acclBytes + 2] = '\0';
     printf("%s", sensorData);
 

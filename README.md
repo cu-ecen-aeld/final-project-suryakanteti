@@ -11,3 +11,6 @@ This repository contains the AESD final project develpmented by Peter Braganza, 
 Peter Braganza (Peter.Braganza@colorado.edu)<br><br>
 Surya Kanteti (Venkata.Kanteti@colorado.edu)<br><br>
 Sona Subair (Sona.Subair@colorado.edu)
+
+## Surya's Final Project Demo
+[Surya's Final Project Demo](https://github.com/cu-ecen-aeld/final-project-suryakanteti/wiki/Surya's-Final-Project-Video)
